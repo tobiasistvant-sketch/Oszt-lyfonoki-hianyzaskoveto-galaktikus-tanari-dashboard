@@ -6,7 +6,7 @@
   <title>Galaktikus Osztályfőnöki Irányítópult – Hiányzáskövető</title>
   <style>
     /* ==========================================================================
-       1. CSS VARIABLES & BASE STYLES (Galaktikus Sci-Fi Téme)
+       1. CSS VARIABLES & BASE STYLES (Galaktikus Sci-Fi Téma)
        ========================================================================== */
     :root {
       --bg-dark: #070b14;
@@ -151,6 +151,17 @@
     .btn-primary:hover {
       background: linear-gradient(135deg, rgba(56, 189, 248, 0.4), rgba(59, 130, 246, 0.4));
       box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    }
+
+    .btn-roster {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(56, 189, 248, 0.25));
+      border-color: var(--purple-accent);
+      color: #ffffff;
+    }
+
+    .btn-roster:hover {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(56, 189, 248, 0.4));
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
     }
 
     .btn-warn {
@@ -329,13 +340,25 @@
     }
 
     .student-nickname {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 700;
       color: #ffffff;
       letter-spacing: 0.5px;
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .seq-tag {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid var(--cyan-holo);
+      color: var(--cyan-holo);
+      font-size: 0.78rem;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 800;
+      font-family: monospace;
     }
 
     .student-rank-icon {
@@ -846,6 +869,9 @@
       </div>
 
       <div class="header-actions">
+        <button class="btn btn-roster" onclick="loadInitialRoster()">
+          <span>🚀 Kezdőnévsor betöltése (28 fő)</span>
+        </button>
         <button class="btn btn-primary" onclick="openAddStudentModal()">
           <span>+ Új Padawan</span>
         </button>
@@ -885,12 +911,13 @@
       <div class="controls-bar">
         <div class="search-sort-group">
           <div class="search-box">
-            <input type="text" id="searchInput" placeholder="🔍 Keresés becenév alapján..." oninput="renderStudents()">
+            <input type="text" id="searchInput" placeholder="🔍 Keresés név/sorszám alapján..." oninput="renderStudents()">
           </div>
 
           <div>
             <select id="sortSelect" class="select-input" onchange="renderStudents()">
-              <option value="nickname">Rendezés: Becenév (A-Z)</option>
+              <option value="seqAsc">Rendezés: Sorszám (1-28)</option>
+              <option value="nickname">Rendezés: Név (A-Z)</option>
               <option value="totalDesc">Rendezés: Összes hiányzás (Csökkenő)</option>
               <option value="pendingDesc">Rendezés: Igazolásra váró (Csökkenő)</option>
               <option value="parentalDesc">Rendezés: Szülői keret (Csökkenő)</option>
@@ -993,8 +1020,12 @@
       <form id="studentForm" onsubmit="handleStudentFormSubmit(event)">
         <input type="hidden" id="studentFormId">
         <div class="form-group">
-          <label for="studentFormNickname">Becenév / Azonosító (Névtelenített!):</label>
-          <input type="text" id="studentFormNickname" class="form-control" placeholder="pl. Padawan Géza, Kadét B-12" required style="width: 100%;">
+          <label for="studentFormSeq">Sorszám (1-28):</label>
+          <input type="number" id="studentFormSeq" class="form-control" min="1" max="99" style="width: 100%;">
+        </div>
+        <div class="form-group">
+          <label for="studentFormNickname">Becenév / Azonosító (Monogram & Fantázianév):</label>
+          <input type="text" id="studentFormNickname" class="form-control" placeholder="pl. N.A-Z. · Vader" required style="width: 100%;">
           <small style="color: var(--text-muted); font-size: 0.78rem; display: block; margin-top: 4px;">
             🔒 Adatvédelmi szabály: Kérjük, NE adjon meg teljes nevet, CNP-t, címet vagy telefonszámot!
           </small>
@@ -1242,7 +1273,7 @@
     <table class="print-table">
       <thead>
         <tr>
-          <th>Tanuló azonosító / Becenév</th>
+          <th>Sorszám / Tanuló azonosító</th>
           <th>Összes hiányzás</th>
           <th>Szülői igazolás (max. 40)</th>
           <th>Még felhasználható szülői</th>
@@ -1265,11 +1296,43 @@
        ========================================================================== -->
   <script>
     /* ==========================================================================
-       STATE & CONSTANTS
+       1. CONSTANTS & INITIAL ROSTER DATA (28 FŐS KEZDŐNÉVSOR)
        ========================================================================== */
     const STORAGE_KEY = 'galactic_attendance_data_v1';
     const DEMO_STORAGE_KEY = 'galactic_attendance_demo_data_v1';
     const PARENTAL_MAX_HOURS = 40;
+
+    // Fixed 28-student initial roster definition
+    const INITIAL_ROSTER = [
+      { seqNumber: 1, initials: 'B.H.', fantasyName: 'Yoda' },
+      { seqNumber: 2, initials: 'B.F-B.', fantasyName: 'Anakin' },
+      { seqNumber: 3, initials: 'B.K.', fantasyName: 'Kenobi' },
+      { seqNumber: 4, initials: 'C.C-I.', fantasyName: 'Chewbacca' },
+      { seqNumber: 5, initials: 'C.N.', fantasyName: 'Ahsoka' },
+      { seqNumber: 6, initials: 'D.K.', fantasyName: 'Maul' },
+      { seqNumber: 7, initials: 'D.Gy-A.', fantasyName: 'Mace' },
+      { seqNumber: 8, initials: 'F.M.', fantasyName: 'Finn' },
+      { seqNumber: 9, initials: 'F.G.', fantasyName: 'Grogu' },
+      { seqNumber: 10, initials: 'F.M.', fantasyName: 'Boba' },
+      { seqNumber: 11, initials: 'G.H-K.', fantasyName: 'Leia' },
+      { seqNumber: 12, initials: 'G.S-M.', fantasyName: 'Rey' },
+      { seqNumber: 13, initials: 'J.D.', fantasyName: 'Jyn' },
+      { seqNumber: 14, initials: 'K.Á.', fantasyName: 'Ezra' },
+      { seqNumber: 15, initials: 'K.A.', fantasyName: 'Sabine' },
+      { seqNumber: 16, initials: 'K.D-L.', fantasyName: 'Luke' },
+      { seqNumber: 17, initials: 'L.R.', fantasyName: 'Lando' },
+      { seqNumber: 18, initials: 'M.K.', fantasyName: 'Mando' },
+      { seqNumber: 19, initials: 'M.N.', fantasyName: 'Padmé' },
+      { seqNumber: 20, initials: 'N.A-Z.', fantasyName: 'Vader' },
+      { seqNumber: 21, initials: 'N.B.', fantasyName: 'Han' },
+      { seqNumber: 22, initials: 'N.B-B.', fantasyName: 'Rex' },
+      { seqNumber: 23, initials: 'N.D.', fantasyName: 'Din' },
+      { seqNumber: 24, initials: 'S.Á.', fantasyName: 'Windu' },
+      { seqNumber: 25, initials: 'S.H-K.', fantasyName: 'Hondo' },
+      { seqNumber: 26, initials: 'S.G.', fantasyName: 'Poe' },
+      { seqNumber: 27, initials: 'S.L-A.', fantasyName: 'Hera' },
+      { seqNumber: 28, initials: 'Sz.N.', fantasyName: 'Bo-Katan' }
+    ];
 
     let appState = {
       isDemoMode: false,
@@ -1281,7 +1344,8 @@
       Student Object Structure:
       {
         id: "std_12345",
-        nickname: "Padawan Géza",
+        seqNumber: 20,
+        nickname: "N.A-Z. · Vader",
         seen40Anim: false,
         absences: [
           {
@@ -1337,7 +1401,6 @@
 
     /* Undo Stack Push */
     function recordUndoSnapshot() {
-      // Keep up to 20 snapshots
       if (appState.undoStack.length >= 20) {
         appState.undoStack.shift();
       }
@@ -1365,6 +1428,47 @@
     }
 
     /* ==========================================================================
+       INITIAL ROSTER LOADER (28 FŐS KEZDŐNÉVSOR BETÖLTÉSE)
+       ========================================================================== */
+    function loadInitialRoster() {
+      if (appState.isDemoMode) {
+        alert('A kezdőnévsor betöltése a normál módhoz tartozik. Kérjük, előbb lépjen ki a Demo Módól!');
+        return;
+      }
+
+      if (appState.students.length > 0) {
+        const confirmMsg = `Már találhatók tanulók a rendszerben (${appState.students.length} fő).\n\nSzeretné betölteni a 28 fős kezdőnévsort (a hiányzó tanulók hozzáadásával)?`;
+        if (!confirm(confirmMsg)) return;
+      }
+
+      recordUndoSnapshot();
+
+      let addedCount = 0;
+      INITIAL_ROSTER.forEach(item => {
+        // Check duplicate by seqNumber or exact nickname match
+        const exists = appState.students.some(s => s.seqNumber === item.seqNumber || s.nickname.includes(item.fantasyName));
+        if (!exists) {
+          appState.students.push({
+            id: 'std_seq_' + item.seqNumber + '_' + Date.now(),
+            seqNumber: item.seqNumber,
+            nickname: `${item.initials} · ${item.fantasyName.toUpperCase()}`,
+            seen40Anim: false,
+            absences: []
+          });
+          addedCount++;
+        }
+      });
+
+      if (addedCount > 0) {
+        saveAppState();
+        renderAll();
+        alert(`Sikeresen betöltve ${addedCount} új tanuló a 28 fős kezdőnévsorból!`);
+      } else {
+        alert('A 28 fős kezdőnévsor már hiánytalanul be van töltve a rendszerbe.');
+      }
+    }
+
+    /* ==========================================================================
        DEMO MODE TOGGLE
        ========================================================================== */
     function toggleDemoMode() {
@@ -1375,7 +1479,6 @@
         btn.classList.add('btn-warn');
         btn.innerHTML = '<span>🧪 Demo Mód (AKTÍV)</span>';
 
-        // Load demo data if empty
         const savedDemo = localStorage.getItem(DEMO_STORAGE_KEY);
         if (!savedDemo) {
           initDemoData();
@@ -1396,7 +1499,8 @@
       appState.students = [
         {
           id: 'demo_1',
-          nickname: 'Padawan Géza',
+          seqNumber: 1,
+          nickname: 'B.H. · YODA',
           seen40Anim: false,
           absences: [
             { id: 'd_a1', date: '2024-09-10', hours: 6, category: 'medical', historyNote: 'Orvosi igazolás' },
@@ -1406,7 +1510,8 @@
         },
         {
           id: 'demo_2',
-          nickname: 'Kadét Ahsoka',
+          seqNumber: 5,
+          nickname: 'C.N. · AHSOKA',
           seen40Anim: true,
           absences: [
             { id: 'd_a4', date: '2024-09-05', hours: 40, category: 'parental', historyNote: 'Éves szülői keret kimerítve' },
@@ -1415,7 +1520,8 @@
         },
         {
           id: 'demo_3',
-          nickname: 'Pilóta Ezra',
+          seqNumber: 14,
+          nickname: 'K.Á. · EZRA',
           seen40Anim: false,
           absences: [
             { id: 'd_a6', date: '2024-09-22', hours: 32, category: 'parental', historyNote: 'Szülői igazolások' },
@@ -1424,7 +1530,8 @@
         },
         {
           id: 'demo_4',
-          nickname: 'Kutató Sabine',
+          seqNumber: 15,
+          nickname: 'K.A. · SABINE',
           seen40Anim: false,
           absences: [
             { id: 'd_a8', date: '2024-10-01', hours: 36, category: 'parental', historyNote: 'Szülői igazolás' }
@@ -1432,7 +1539,8 @@
         },
         {
           id: 'demo_5',
-          nickname: 'Technikus Cal',
+          seqNumber: 20,
+          nickname: 'N.A-Z. · VADER',
           seen40Anim: false,
           absences: [
             { id: 'd_a9', date: '2024-09-12', hours: 12, category: 'medical', historyNote: 'Orvosi igazolás' }
@@ -1532,7 +1640,9 @@
       const sortValue = document.getElementById('sortSelect').value;
 
       let filtered = appState.students.filter(s => {
-        const matchesSearch = s.nickname.toLowerCase().includes(searchValue);
+        const seqStr = s.seqNumber ? `#${s.seqNumber}` : '';
+        const fullSearchTarget = `${seqStr} ${s.nickname}`.toLowerCase();
+        const matchesSearch = fullSearchTarget.includes(searchValue);
         if (!matchesSearch) return false;
 
         if (isAttentionFilterActive) {
@@ -1543,12 +1653,14 @@
         return true;
       });
 
-      // Sorting
+      // Sorting (Sorszám nem változik, csak a kártyák sorrendje!)
       filtered.sort((a, b) => {
         const statsA = getStudentStats(a);
         const statsB = getStudentStats(b);
 
-        if (sortValue === 'nickname') {
+        if (sortValue === 'seqAsc') {
+          return (a.seqNumber || 999) - (b.seqNumber || 999);
+        } else if (sortValue === 'nickname') {
           return a.nickname.localeCompare(b.nickname, 'hu');
         } else if (sortValue === 'totalDesc') {
           return statsB.totalAbsences - statsA.totalAbsences;
@@ -1566,7 +1678,7 @@
         grid.innerHTML = `
           <div class="empty-state">
             <h3>Nincs megjeleníthető Padawan</h3>
-            <p>Hozz létre új tanulót a fenti gombbal, vagy módosítsd a keresési feltételeket.</p>
+            <p>Kattints a <strong>„🚀 Kezdőnévsor betöltése”</strong> gombra a 28 fős névsor betöltéséhez, vagy hozz létre új tanulót!</p>
           </div>
         `;
         return;
@@ -1591,12 +1703,14 @@
           cardBorderClass = 'card-warn';
         }
 
+        const seqTag = s.seqNumber ? `<span class="seq-tag">#${s.seqNumber}</span>` : '';
+
         return `
           <div class="student-card ${cardBorderClass}">
             <div>
               <div class="card-header">
                 <div class="student-nickname">
-                  <span class="student-rank-icon">🛡️</span>
+                  ${seqTag}
                   <span>${escapeHtml(s.nickname)}</span>
                 </div>
                 <div class="card-actions-top">
@@ -1672,7 +1786,6 @@
       appState.students.forEach(s => {
         const overallStats = getStudentStats(s);
 
-        // Yearly limit indicators
         if (overallStats.totalParental >= 30 && overallStats.totalParental < 35) parental30Count++;
         if (overallStats.totalParental >= 35 && overallStats.totalParental < 40) parental35Count++;
         if (overallStats.totalParental >= 40) parental40Count++;
@@ -1748,6 +1861,7 @@
     function openAddStudentModal() {
       document.getElementById('studentModalTitle').textContent = '👨‍🎓 Új Padawan Felvétele';
       document.getElementById('studentFormId').value = '';
+      document.getElementById('studentFormSeq').value = appState.students.length + 1;
       document.getElementById('studentFormNickname').value = '';
       openModal('studentModal');
     }
@@ -1758,6 +1872,7 @@
 
       document.getElementById('studentModalTitle').textContent = '✏️ Padawan Szerkesztése';
       document.getElementById('studentFormId').value = student.id;
+      document.getElementById('studentFormSeq').value = student.seqNumber || '';
       document.getElementById('studentFormNickname').value = student.nickname;
       openModal('studentModal');
     }
@@ -1765,6 +1880,7 @@
     function handleStudentFormSubmit(e) {
       e.preventDefault();
       const id = document.getElementById('studentFormId').value;
+      const seqNumber = parseInt(document.getElementById('studentFormSeq').value, 10) || null;
       const nickname = document.getElementById('studentFormNickname').value.trim();
 
       if (!nickname) return;
@@ -1774,11 +1890,15 @@
       if (id) {
         // Edit existing
         const student = appState.students.find(s => s.id === id);
-        if (student) student.nickname = nickname;
+        if (student) {
+          student.nickname = nickname;
+          student.seqNumber = seqNumber;
+        }
       } else {
         // Create new
         const newStudent = {
           id: 'std_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+          seqNumber: seqNumber,
           nickname: nickname,
           seen40Anim: false,
           absences: []
@@ -1808,7 +1928,7 @@
        ========================================================================== */
     function openDirectAbsenceModal() {
       if (appState.students.length === 0) {
-        alert('Kérjük, először vegyen fel legalább egy tanulót!');
+        alert('Kérjük, először töltse be a kezdőnévsort vagy vegyen fel legalább egy tanulót!');
         return;
       }
       populateStudentSelect('absenceStudentSelect');
@@ -1828,8 +1948,12 @@
       const select = document.getElementById(elementId);
       if (!select) return;
 
-      select.innerHTML = appState.students.map(s => {
-        return `<option value="${s.id}" ${s.id === selectedId ? 'selected' : ''}>${escapeHtml(s.nickname)}</option>`;
+      // Sort by seqNumber for selection dropdown
+      const sorted = [...appState.students].sort((a, b) => (a.seqNumber || 999) - (b.seqNumber || 999));
+
+      select.innerHTML = sorted.map(s => {
+        const seqPrefix = s.seqNumber ? `#${s.seqNumber} · ` : '';
+        return `<option value="${s.id}" ${s.id === selectedId ? 'selected' : ''}>${seqPrefix}${escapeHtml(s.nickname)}</option>`;
       }).join('');
     }
 
@@ -1856,7 +1980,7 @@
         const potentialParental = currentStats.totalParental + hours;
         if (potentialParental > PARENTAL_MAX_HOURS) {
           alert(`⚠️ Szigorú korlát figyelmeztetés:\nA művelet nem hajtható végre!\nA tanuló szülői kerete túllépné a megengedett 40 órát (${currentStats.totalParental} + ${hours} = ${potentialParental} óra).\n\nKérjük, rögzítse orvosi igazolásként vagy igazolásra váróként!`);
-          return; // Cancel operation
+          return;
         }
       }
 
@@ -1875,10 +1999,9 @@
 
       const updatedStats = getStudentStats(student);
 
-      // CHECK FOR FIRST TIME 40/40 REACHED ANIMATION
       let triggerAnim = false;
       if (updatedStats.totalParental >= PARENTAL_MAX_HOURS && !student.seen40Anim) {
-        student.seen40Anim = true; // Mark as seen
+        student.seen40Anim = true;
         triggerAnim = true;
       }
 
@@ -1906,7 +2029,7 @@
       }
 
       document.getElementById('reclassifyStudentId').value = student.id;
-      document.getElementById('reclassifyStudentName').textContent = student.nickname;
+      document.getElementById('reclassifyStudentName').textContent = `${student.seqNumber ? '#' + student.seqNumber + ' · ' : ''}${student.nickname}`;
       document.getElementById('reclassifyPendingAvailable').textContent = stats.totalPending;
       document.getElementById('reclassifyHoursInput').value = stats.totalPending;
       document.getElementById('reclassifyHoursInput').max = stats.totalPending;
@@ -1930,7 +2053,6 @@
         return;
       }
 
-      // Check parental limit if target is parental
       if (targetCategory === 'parental') {
         if (currentStats.totalParental + reclassifyHours > PARENTAL_MAX_HOURS) {
           alert(`⚠️ Szigorú korlát figyelmeztetés:\nNem minősíthető át ${reclassifyHours} óra szülőivé, mert a tanuló szülői kerete túllépné a 40 órát (${currentStats.totalParental} + ${reclassifyHours} = ${currentStats.totalParental + reclassifyHours} óra).`);
@@ -1940,10 +2062,7 @@
 
       recordUndoSnapshot();
 
-      // Deduct from pending entries chronologically and move to targetCategory
       let remainingToReclassify = reclassifyHours;
-
-      // Filter pending absences
       const pendingEntries = student.absences.filter(a => a.category === 'pending');
 
       for (let entry of pendingEntries) {
@@ -1951,18 +2070,15 @@
 
         const entryHours = entry.hours;
         if (entryHours <= remainingToReclassify) {
-          // Entire entry changes category
           entry.category = targetCategory;
           entry.historyNote = (entry.historyNote || '') + ` | Átminősítve (${targetCategory}): ${new Date().toLocaleDateString('hu-HU')}`;
           remainingToReclassify -= entryHours;
         } else {
-          // Entry split into converted part and remaining pending part
           const convertedHours = remainingToReclassify;
           const leftPendingHours = entryHours - convertedHours;
 
-          entry.hours = leftPendingHours; // Keep remainder in pending
+          entry.hours = leftPendingHours;
 
-          // Add new entry for converted part
           student.absences.push({
             id: 'abs_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
             date: entry.date,
@@ -2000,7 +2116,7 @@
       const student = appState.students.find(s => s.id === studentId);
       if (!student) return;
 
-      document.getElementById('historyStudentTitle').textContent = student.nickname;
+      document.getElementById('historyStudentTitle').textContent = `${student.seqNumber ? '#' + student.seqNumber + ' · ' : ''}${student.nickname}`;
       const tableBody = document.getElementById('historyTableBody');
 
       if (!student.absences || student.absences.length === 0) {
@@ -2062,7 +2178,6 @@
       const student = appState.students.find(s => s.id === studentId);
       if (!student || !student.absences[index] || isNaN(hours) || hours <= 0) return;
 
-      // Check parental limit
       if (category === 'parental') {
         const currentStats = getStudentStats(student);
         const oldEntry = student.absences[index];
@@ -2085,7 +2200,7 @@
       saveAppState();
       renderAll();
       closeModal('editEntryModal');
-      openHistoryModal(studentId); // Refresh history view
+      openHistoryModal(studentId);
     }
 
     function deleteEntry(studentId, index) {
@@ -2097,7 +2212,7 @@
         student.absences.splice(index, 1);
         saveAppState();
         renderAll();
-        openHistoryModal(studentId); // Refresh history view
+        openHistoryModal(studentId);
       }
     }
 
@@ -2111,7 +2226,7 @@
     function exportDataJSON() {
       const exportObject = {
         app: 'GalacticAttendanceTracker',
-        version: '1.0',
+        version: '2.5',
         exportDate: new Date().toISOString(),
         students: appState.students
       };
@@ -2133,7 +2248,6 @@
       reader.onload = function(e) {
         try {
           const parsed = JSON.parse(e.target.result);
-          // Schema Validation
           if (parsed && Array.isArray(parsed.students)) {
             if (confirm(`A fájl sikeresen beolvasva (${parsed.students.length} tanuló található benne).\nSzeretné felülírni a jelenlegi adatokat?`)) {
               recordUndoSnapshot();
@@ -2151,7 +2265,6 @@
         }
       };
       reader.readAsText(file);
-      // Reset input
       event.target.value = '';
     }
 
@@ -2184,11 +2297,15 @@
 
       const printTableBody = document.getElementById('printTableBody');
       if (printTableBody) {
-        printTableBody.innerHTML = appState.students.map(s => {
+        // Sort by seqNumber for print table
+        const sorted = [...appState.students].sort((a, b) => (a.seqNumber || 999) - (b.seqNumber || 999));
+
+        printTableBody.innerHTML = sorted.map(s => {
           const stats = getStudentStats(s);
+          const seqDisplay = s.seqNumber ? `#${s.seqNumber} · ` : '';
           return `
             <tr>
-              <td><strong>${escapeHtml(s.nickname)}</strong></td>
+              <td><strong>${seqDisplay}${escapeHtml(s.nickname)}</strong></td>
               <td>${stats.totalAbsences} óra</td>
               <td>${stats.totalParental} / ${PARENTAL_MAX_HOURS} óra</td>
               <td>${stats.parentalRemaining} óra</td>
