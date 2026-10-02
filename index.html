@@ -1,0 +1,2228 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galaktikus Osztályfőnöki Irányítópult – Hiányzáskövető</title>
+  <style>
+    /* ==========================================================================
+       1. CSS VARIABLES & BASE STYLES (Galaktikus Sci-Fi Téme)
+       ========================================================================== */
+    :root {
+      --bg-dark: #070b14;
+      --bg-card: rgba(15, 23, 42, 0.75);
+      --bg-card-hover: rgba(30, 41, 59, 0.85);
+      --border-holo: rgba(56, 189, 248, 0.3);
+      --border-holo-bright: rgba(56, 189, 248, 0.7);
+
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+
+      /* Energiasáv & Stat Kiemelés Színek */
+      --cyan-holo: #38bdf8;
+      --blue-glow: #3b82f6;
+      --green-saber: #22c55e;
+      --yellow-warn: #eab308;
+      --orange-alert: #f97316;
+      --red-critical: #ef4444;
+      --purple-accent: #a855f7;
+
+      --font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --radius: 12px;
+      --shadow-holo: 0 0 15px rgba(56, 189, 248, 0.15);
+      --transition: all 0.25s ease-in-out;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image:
+        radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 40%),
+        radial-gradient(1px 1px at 10px 10px, white, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 150px 80px, rgba(255,255,255,0.8), rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 200px 250px, white, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 300px 120px, rgba(56, 189, 248, 0.9), rgba(0,0,0,0));
+      background-size: 100% 100%, 100% 100%, 350px 350px, 400px 400px, 250px 250px, 500px 500px;
+      color: var(--text-main);
+      font-family: var(--font-family);
+      min-height: 100vh;
+      padding-bottom: 60px;
+      line-height: 1.5;
+    }
+
+    /* Container */
+    .app-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* ==========================================================================
+       2. HEADER & NAVIGATION
+       ========================================================================== */
+    header.holo-header {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-holo);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-holo);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-title-zone h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+    }
+
+    .header-title-zone h1 span.badge-tag {
+      font-size: 0.75rem;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid var(--cyan-holo);
+      color: var(--cyan-holo);
+      padding: 3px 8px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .header-subtitle {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Buttons */
+    .btn {
+      background: rgba(30, 41, 59, 0.8);
+      color: var(--text-main);
+      border: 1px solid var(--border-holo);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition);
+      user-select: none;
+    }
+
+    .btn:hover {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--cyan-holo);
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(59, 130, 246, 0.25));
+      border-color: var(--cyan-holo);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.4), rgba(59, 130, 246, 0.4));
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    }
+
+    .btn-warn {
+      background: rgba(234, 179, 8, 0.15);
+      border-color: var(--yellow-warn);
+      color: var(--yellow-warn);
+    }
+
+    .btn-warn:hover {
+      background: rgba(234, 179, 8, 0.3);
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(234, 179, 8, 0.4);
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: var(--red-critical);
+      color: var(--red-critical);
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.3);
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 0.8rem;
+      border-radius: 6px;
+    }
+
+    /* Tabs Bar */
+    .tab-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 10px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .tab-btn.active {
+      color: var(--cyan-holo);
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid var(--border-holo);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+    }
+
+    /* Controls & Filter Bar */
+    .controls-bar {
+      background: var(--bg-card);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-holo);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .search-sort-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .search-box input, .select-input, .form-control {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--border-holo);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .search-box input:focus, .select-input:focus, .form-control:focus {
+      border-color: var(--cyan-holo);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+    }
+
+    .filter-toggle-btn.active {
+      background: rgba(249, 115, 22, 0.2);
+      border-color: var(--orange-alert);
+      color: var(--orange-alert);
+      box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
+    }
+
+    /* ==========================================================================
+       3. STUDENT CARDS GRID
+       ========================================================================== */
+    .students-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .student-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--border-holo);
+      border-radius: var(--radius);
+      padding: 18px;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .student-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--cyan-holo);
+      border-radius: 4px 0 0 4px;
+    }
+
+    .student-card.card-warn::before {
+      background: var(--yellow-warn);
+    }
+
+    .student-card.card-alert::before {
+      background: var(--orange-alert);
+    }
+
+    .student-card.card-critical::before {
+      background: var(--red-critical);
+      box-shadow: 0 0 10px var(--red-critical);
+    }
+
+    .student-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-holo-bright);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+      padding-left: 8px;
+    }
+
+    .student-nickname {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .student-rank-icon {
+      color: var(--cyan-holo);
+      font-size: 0.9rem;
+    }
+
+    .card-actions-top {
+      display: flex;
+      gap: 4px;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+
+    .icon-btn:hover {
+      color: var(--cyan-holo);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .icon-btn.delete-btn:hover {
+      color: var(--red-critical);
+    }
+
+    /* Attendance Metrics inside card */
+    .metrics-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.88rem;
+    }
+
+    .metric-label {
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .metric-value {
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    /* Lightsaber Energy Gauge */
+    .saber-gauge-wrapper {
+      margin: 8px 0;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 8px;
+      padding: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .saber-gauge-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      margin-bottom: 6px;
+    }
+
+    .saber-track {
+      width: 100%;
+      height: 10px;
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 5px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+
+    .saber-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--green-saber);
+      box-shadow: 0 0 10px var(--green-saber);
+      transition: width 0.4s ease, background-color 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .saber-bar.saber-warn {
+      background: var(--yellow-warn);
+      box-shadow: 0 0 10px var(--yellow-warn);
+    }
+
+    .saber-bar.saber-alert {
+      background: var(--orange-alert);
+      box-shadow: 0 0 10px var(--orange-alert);
+    }
+
+    .saber-bar.saber-critical {
+      background: var(--red-critical);
+      box-shadow: 0 0 12px var(--red-critical);
+      animation: saberPulse 1.2s infinite alternate;
+    }
+
+    @keyframes saberPulse {
+      0% { opacity: 0.8; box-shadow: 0 0 6px var(--red-critical); }
+      100% { opacity: 1; box-shadow: 0 0 15px var(--red-critical); }
+    }
+
+    /* Pending Badge Warning Box */
+    .pending-box {
+      background: rgba(234, 179, 8, 0.1);
+      border: 1px dashed var(--yellow-warn);
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4px;
+      font-size: 0.85rem;
+      color: var(--yellow-warn);
+    }
+
+    .pending-box.has-pending {
+      animation: pendingGlow 2s infinite alternate;
+    }
+
+    @keyframes pendingGlow {
+      0% { border-color: rgba(234, 179, 8, 0.4); background: rgba(234, 179, 8, 0.08); }
+      100% { border-color: rgba(234, 179, 8, 0.9); background: rgba(234, 179, 8, 0.18); }
+    }
+
+    .card-footer-btns {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      background: var(--bg-card);
+      border: 1px dashed var(--border-holo);
+      border-radius: var(--radius);
+      color: var(--text-muted);
+      grid-column: 1 / -1;
+    }
+
+    .empty-state h3 {
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    /* ==========================================================================
+       4. CLASS DASHBOARD STATS VIEW
+       ========================================================================== */
+    .dashboard-view {
+      display: none;
+    }
+
+    .stats-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+      background: var(--bg-card);
+      padding: 16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-holo);
+    }
+
+    .stats-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-holo);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .stat-card-title {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-card-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .stat-card-sub {
+      font-size: 0.8rem;
+      color: var(--cyan-holo);
+    }
+
+    .stat-breakdown-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-holo);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .stat-breakdown-box h3 {
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tree-list {
+      list-style: none;
+      font-family: monospace;
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: var(--text-main);
+    }
+
+    .tree-list li {
+      padding-left: 8px;
+    }
+
+    /* ==========================================================================
+       5. MODALS & POPUPS
+       ========================================================================== */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: #0f172a;
+      border: 1px solid var(--border-holo-bright);
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.25);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 540px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
+      position: relative;
+      transform: translateY(20px);
+      transition: transform 0.25s ease;
+    }
+
+    .modal-overlay.active .modal-box {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 12px;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .modal-close:hover {
+      color: #ffffff;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .quick-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .quick-hour-btn {
+      flex: 1;
+      min-width: 45px;
+      padding: 8px 4px;
+      text-align: center;
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid var(--border-holo);
+      color: var(--cyan-holo);
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .quick-hour-btn:hover {
+      background: var(--cyan-holo);
+      color: #0f172a;
+    }
+
+    /* Sci-Fi Hologram 40/40 Animation Modal */
+    .holo-anim-content {
+      text-align: center;
+      padding: 20px 10px;
+    }
+
+    .holo-core {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 20px auto;
+      border-radius: 50%;
+      border: 3px solid var(--red-critical);
+      box-shadow: 0 0 25px var(--red-critical);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2.5rem;
+      animation: holoCorePulse 1s infinite alternate;
+      background: rgba(239, 68, 68, 0.15);
+    }
+
+    @keyframes holoCorePulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 15px var(--red-critical); }
+      100% { transform: scale(1.08); box-shadow: 0 0 35px var(--red-critical); }
+    }
+
+    .holo-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--red-critical);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      text-shadow: 0 0 10px var(--red-critical);
+    }
+
+    /* History Table */
+    .history-table-wrapper {
+      max-height: 350px;
+      overflow-y: auto;
+      border: 1px solid var(--border-holo);
+      border-radius: 8px;
+    }
+
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      text-align: left;
+    }
+
+    .history-table th, .history-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .history-table th {
+      background: rgba(30, 41, 59, 0.9);
+      color: var(--text-muted);
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+    }
+
+    .history-table tr:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    /* ==========================================================================
+       6. PRINTABLE SUMMARY VIEW (@media print)
+       ========================================================================== */
+    #printSection {
+      display: none;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printSection, #printSection * {
+        visibility: visible;
+      }
+      #printSection {
+        display: block !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 20pt;
+        font-family: Arial, sans-serif;
+      }
+      .print-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15pt;
+      }
+      .print-table th, .print-table td {
+        border: 1px solid #333333;
+        padding: 6pt 8pt;
+        text-align: left;
+        font-size: 10pt;
+      }
+      .print-table th {
+        background-color: #f0f0f0;
+      }
+      .print-header {
+        text-align: center;
+        border-bottom: 2px solid #000;
+        padding-bottom: 10pt;
+        margin-bottom: 15pt;
+      }
+    }
+
+    /* Responsiveness */
+    @media (max-width: 640px) {
+      .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+      .controls-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .search-sort-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .card-footer-btns {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- ==========================================================================
+         HEADER / GALACTIC COMMAND BAR
+         ========================================================================== -->
+    <header class="holo-header">
+      <div class="header-title-zone">
+        <h1>
+          ⚡ GALAKTIKUS OSZTÁLYFŐNÖK
+          <span class="badge-tag">Jedi Akadémia v2.5</span>
+        </h1>
+        <p class="header-subtitle">Napi hiányzáskövető & Tanulói energiasáv irányítópult</p>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn btn-primary" onclick="openAddStudentModal()">
+          <span>+ Új Padawan</span>
+        </button>
+        <button class="btn" onclick="openDirectAbsenceModal()">
+          <span>⚡ + Hiányzás rögzítése</span>
+        </button>
+        <button class="btn btn-warn" id="undoBtn" onclick="handleUndo()" disabled title="Utolsó művelet visszavonása">
+          <span>↩ Visszavonás (Undo)</span>
+        </button>
+        <button class="btn" onclick="openBackupModal()">
+          <span>💾 Adatmentés / Import</span>
+        </button>
+        <button class="btn" onclick="triggerPrintView()">
+          <span>🖨 Nyomtatás (A4)</span>
+        </button>
+        <button class="btn btn-sm" onclick="toggleDemoMode()" id="demoToggleBtn">
+          <span>🧪 Demo Mód</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- TABS BAR -->
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tabStudentsBtn" onclick="switchTab('students')">
+        <span>👨‍🎓 Tanulói Kártyák (<span id="studentCountBadge">0</span>)</span>
+      </button>
+      <button class="tab-btn" id="tabStatsBtn" onclick="switchTab('stats')">
+        <span>📊 Osztálystatisztika</span>
+      </button>
+    </div>
+
+    <!-- ==========================================================================
+         STUDENTS VIEW (MAIN GRID)
+         ========================================================================== -->
+    <main id="studentsView">
+      <!-- Controls Bar -->
+      <div class="controls-bar">
+        <div class="search-sort-group">
+          <div class="search-box">
+            <input type="text" id="searchInput" placeholder="🔍 Keresés becenév alapján..." oninput="renderStudents()">
+          </div>
+
+          <div>
+            <select id="sortSelect" class="select-input" onchange="renderStudents()">
+              <option value="nickname">Rendezés: Becenév (A-Z)</option>
+              <option value="totalDesc">Rendezés: Összes hiányzás (Csökkenő)</option>
+              <option value="pendingDesc">Rendezés: Igazolásra váró (Csökkenő)</option>
+              <option value="parentalDesc">Rendezés: Szülői keret (Csökkenő)</option>
+              <option value="medicalDesc">Rendezés: Orvosi igazolás (Csökkenő)</option>
+            </select>
+          </div>
+
+          <button class="btn filter-toggle-btn" id="attentionFilterBtn" onclick="toggleAttentionFilter()">
+            <span>⚠️ Figyelmet igényel</span>
+          </button>
+        </div>
+
+        <div style="font-size: 0.85rem; color: var(--text-muted);" id="filterStatusInfo">
+          Összes tanuló megjelenítve
+        </div>
+      </div>
+
+      <!-- Grid Container -->
+      <div class="students-grid" id="studentsGridContainer">
+        <!-- Rendered dynamically -->
+      </div>
+    </main>
+
+    <!-- ==========================================================================
+         CLASS DASHBOARD STATS VIEW
+         ========================================================================== -->
+    <section id="dashboardView" class="dashboard-view">
+      <div class="stats-header-bar">
+        <div>
+          <h2 style="font-size: 1.3rem; color: #ffffff;">📊 Osztályszintű Statisztikai Irányítópult</h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Automatikus számítás a rögzített adatállomány alapján</p>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <label style="font-size: 0.88rem; color: var(--text-muted);">Időszak szűrése:</label>
+          <select id="statsPeriodSelect" class="select-input" onchange="renderDashboard()">
+            <option value="year">Teljes Tanév</option>
+            <option value="09">Szeptember</option>
+            <option value="10">Október</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+            <option value="01">Január</option>
+            <option value="02">Február</option>
+            <option value="03">Március</option>
+            <option value="04">Április</option>
+            <option value="05">Május</option>
+            <option value="06">Június</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Stats Summary Cards -->
+      <div class="stats-summary-grid">
+        <div class="stat-card">
+          <span class="stat-card-title">Összes Hiányzott Óra</span>
+          <span class="stat-card-value" id="statTotalAbsences">0 óra</span>
+          <span class="stat-card-sub" id="statPeriodLabel">Teljes tanév</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-card-title">Összes Igazolt Óra</span>
+          <span class="stat-card-value" style="color: var(--green-saber);" id="statTotalExcused">0 óra</span>
+          <span class="stat-card-sub">Szülői + Orvosi</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-card-title">Igazolásra Váró Órák</span>
+          <span class="stat-card-value" style="color: var(--yellow-warn);" id="statTotalPending">0 óra</span>
+          <span class="stat-card-sub" id="statPendingStudentsCount">0 tanulónál</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-card-title">Szülői Keret (30+ Óra)</span>
+          <span class="stat-card-value" style="color: var(--orange-alert);" id="statParental30Count">0 fő</span>
+          <span class="stat-card-sub">Közeledik a keret vége</span>
+        </div>
+      </div>
+
+      <!-- Breakdown Details Box -->
+      <div class="stat-breakdown-box">
+        <h3>📐 Részletes Összesítő Bontás</h3>
+        <ul class="tree-list" id="statTreeList">
+          <!-- Rendered dynamically -->
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <!-- ==========================================================================
+       MODALS SECTION
+       ========================================================================== -->
+
+  <!-- 1. Add / Edit Student Modal -->
+  <div class="modal-overlay" id="studentModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="studentModalTitle">👨‍🎓 Új Padawan Felvétele</h3>
+        <button class="modal-close" onclick="closeModal('studentModal')">&times;</button>
+      </div>
+      <form id="studentForm" onsubmit="handleStudentFormSubmit(event)">
+        <input type="hidden" id="studentFormId">
+        <div class="form-group">
+          <label for="studentFormNickname">Becenév / Azonosító (Névtelenített!):</label>
+          <input type="text" id="studentFormNickname" class="form-control" placeholder="pl. Padawan Géza, Kadét B-12" required style="width: 100%;">
+          <small style="color: var(--text-muted); font-size: 0.78rem; display: block; margin-top: 4px;">
+            🔒 Adatvédelmi szabály: Kérjük, NE adjon meg teljes nevet, CNP-t, címet vagy telefonszámot!
+          </small>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn" onclick="closeModal('studentModal')">Mégse</button>
+          <button type="submit" class="btn btn-primary">Mentés</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Record Absence Modal -->
+  <div class="modal-overlay" id="absenceModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">⚡ Hiányzás Rögzítése</h3>
+        <button class="modal-close" onclick="closeModal('absenceModal')">&times;</button>
+      </div>
+      <form id="absenceForm" onsubmit="handleAbsenceFormSubmit(event)">
+        <div class="form-group">
+          <label for="absenceStudentSelect">Tanuló kiválasztása:</label>
+          <select id="absenceStudentSelect" class="form-control" style="width: 100%;" required>
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="absenceCategorySelect">Igazolási Kategória:</label>
+          <select id="absenceCategorySelect" class="form-control" style="width: 100%;" required>
+            <option value="pending">🟡 Igazolásra vár (Függőben lévő)</option>
+            <option value="parental">🟢 Szülői igazolás (40 órás keretből)</option>
+            <option value="medical">🔵 Orvosi igazolás (Korlátlan)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="absenceDateInput">Dátum:</label>
+          <input type="date" id="absenceDateInput" class="form-control" style="width: 100%;" required>
+        </div>
+
+        <div class="form-group">
+          <label for="absenceHoursInput">Tanórák száma:</label>
+          <input type="number" id="absenceHoursInput" class="form-control" min="1" max="50" value="1" required style="width: 100%;">
+          <div class="quick-btn-group">
+            <button type="button" class="quick-hour-btn" onclick="setQuickHours(1)">+1 óra</button>
+            <button type="button" class="quick-hour-btn" onclick="setQuickHours(2)">+2 óra</button>
+            <button type="button" class="quick-hour-btn" onclick="setQuickHours(3)">+3 óra</button>
+            <button type="button" class="quick-hour-btn" onclick="setQuickHours(4)">+4 óra</button>
+            <button type="button" class="quick-hour-btn" onclick="setQuickHours(5)">+5 óra</button>
+            <button type="button" class="quick-hour-btn" onclick="setQuickHours(6)">+6 óra</button>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn" onclick="closeModal('absenceModal')">Mégse</button>
+          <button type="submit" class="btn btn-primary">Rögzítés</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Reclassify Pending Hours Modal -->
+  <div class="modal-overlay" id="reclassifyModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">🔄 Igazolásra Váró Órák Átminősítése</h3>
+        <button class="modal-close" onclick="closeModal('reclassifyModal')">&times;</button>
+      </div>
+      <form id="reclassifyForm" onsubmit="handleReclassifyFormSubmit(event)">
+        <input type="hidden" id="reclassifyStudentId">
+
+        <div style="background: rgba(234, 179, 8, 0.1); border: 1px solid var(--yellow-warn); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+          <div style="font-weight: 700; color: #ffffff;" id="reclassifyStudentName">--</div>
+          <div style="font-size: 0.88rem; color: var(--yellow-warn); margin-top: 4px;">
+            Jelenleg igazolásra vár: <strong id="reclassifyPendingAvailable">0</strong> óra
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="reclassifyHoursInput">Átminősítendő órák száma:</label>
+          <input type="number" id="reclassifyHoursInput" class="form-control" min="1" required style="width: 100%;">
+        </div>
+
+        <div class="form-group">
+          <label for="reclassifyTargetSelect">Célkategória:</label>
+          <select id="reclassifyTargetSelect" class="form-control" style="width: 100%;" required>
+            <option value="parental">🟢 Szülő által igazolt (40 órás keret)</option>
+            <option value="medical">🔵 Orvosi igazolással igazolt</option>
+          </select>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn" onclick="closeModal('reclassifyModal')">Mégse</button>
+          <button type="submit" class="btn btn-primary">Átminősítés végrehajtása</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. History Modal -->
+  <div class="modal-overlay" id="historyModal">
+    <div class="modal-box" style="max-width: 680px;">
+      <div class="modal-header">
+        <h3 class="modal-title">📜 Hiányzási Előzmények: <span id="historyStudentTitle">--</span></h3>
+        <button class="modal-close" onclick="closeModal('historyModal')">&times;</button>
+      </div>
+
+      <div class="history-table-wrapper">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Dátum</th>
+              <th>Óraszám</th>
+              <th>Kategória</th>
+              <th>Megjegyzés / Módosítva</th>
+              <th>Művelet</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <!-- Populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+        <button type="button" class="btn" onclick="closeModal('historyModal')">Bezárás</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Edit History Entry Modal -->
+  <div class="modal-overlay" id="editEntryModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">✏️ Bejegyzés Módosítása</h3>
+        <button class="modal-close" onclick="closeModal('editEntryModal')">&times;</button>
+      </div>
+      <form id="editEntryForm" onsubmit="handleEditEntryFormSubmit(event)">
+        <input type="hidden" id="editEntryStudentId">
+        <input type="hidden" id="editEntryIndex">
+
+        <div class="form-group">
+          <label for="editEntryDate">Dátum:</label>
+          <input type="date" id="editEntryDate" class="form-control" style="width: 100%;" required>
+        </div>
+
+        <div class="form-group">
+          <label for="editEntryHours">Óraszám:</label>
+          <input type="number" id="editEntryHours" class="form-control" min="1" max="50" required style="width: 100%;">
+        </div>
+
+        <div class="form-group">
+          <label for="editEntryCategory">Kategória:</label>
+          <select id="editEntryCategory" class="form-control" style="width: 100%;" required>
+            <option value="pending">🟡 Igazolásra vár</option>
+            <option value="parental">🟢 Szülői igazolás</option>
+            <option value="medical">🔵 Orvosi igazolás</option>
+          </select>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn" onclick="closeModal('editEntryModal')">Mégse</button>
+          <button type="submit" class="btn btn-primary">Mentés</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 6. Backup / Import / Export / New Year Modal -->
+  <div class="modal-overlay" id="backupModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">💾 Adatkezelés & Tanév Lezárás</h3>
+        <button class="modal-close" onclick="closeModal('backupModal')">&times;</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div style="background: rgba(30, 41, 59, 0.8); padding: 14px; border-radius: 8px; border: 1px solid var(--border-holo);">
+          <h4 style="color: var(--cyan-holo); margin-bottom: 6px;">📥 Biztonsági mentés letöltése</h4>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 10px;">
+            Mentsd le az osztály összes jelenlegi adatait JSON fájlba.
+          </p>
+          <button class="btn btn-primary" onclick="exportDataJSON()" style="width: 100%;">
+            <span>JSON Exportálása (.json)</span>
+          </button>
+        </div>
+
+        <div style="background: rgba(30, 41, 59, 0.8); padding: 14px; border-radius: 8px; border: 1px solid var(--border-holo);">
+          <h4 style="color: var(--cyan-holo); margin-bottom: 6px;">📤 Adatállomány betöltése (Import)</h4>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 10px;">
+            Már meglévő JSON mentés visszatöltése (séma ellenőrzéssel).
+          </p>
+          <input type="file" id="jsonFileInput" accept=".json" style="display: none;" onchange="importDataJSON(event)">
+          <button class="btn" onclick="document.getElementById('jsonFileInput').click()" style="width: 100%;">
+            <span>JSON Betöltése...</span>
+          </button>
+        </div>
+
+        <div style="background: rgba(239, 68, 68, 0.1); padding: 14px; border-radius: 8px; border: 1px solid var(--red-critical);">
+          <h4 style="color: var(--red-critical); margin-bottom: 6px;">⚠️ Új Tanév Kezdése / Adatok Lezárása</h4>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 10px;">
+            Törli az összes hiányzási előzményt a rendszerből. Új tanév indítása előtt automatikusan felajánlja a biztonsági mentést.
+          </p>
+          <button class="btn btn-danger" onclick="startNewSchoolYear()" style="width: 100%;">
+            <span>Új Tanév Kezdése (Adatnullázás)</span>
+          </button>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+        <button type="button" class="btn" onclick="closeModal('backupModal')">Bezárás</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Sci-Fi Mini Hologram Animation Modal (First time 40/40 reached) -->
+  <div class="modal-overlay" id="holoAnimModal">
+    <div class="modal-box" style="border-color: var(--red-critical);">
+      <div class="holo-anim-content">
+        <div class="holo-core">⚠️</div>
+        <div class="holo-title">KERET KIMERÜLT – 40/40</div>
+        <p style="font-size: 1.05rem; color: #ffffff; margin-bottom: 8px;" id="holoAnimStudentName">
+          PADAWAN
+        </p>
+        <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px;">
+          A szülői igazolási energiacella teljesen lemerült! A tanuló elérte az éves 40 órás maximális keretet. További hiányzást csak orvosi igazolással vagy igazolatlan/függőben lévőként rögzíthet.
+        </p>
+        <button class="btn btn-danger" onclick="closeModal('holoAnimModal')" style="width: 100%; justify-content: center; font-size: 1rem; padding: 10px;">
+          Visszaigazolás & Rendszer-nyugtázás
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       PRINT SECTION (A4 SUMMARY FOR PRINTING)
+       ========================================================================== -->
+  <div id="printSection">
+    <div class="print-header">
+      <h2>GALAKTIKUS OSZTÁLYFÖNÖKI HIÁNYZÁSI ÖSSZEGZŐ</h2>
+      <p>Kiállítás dátuma: <span id="printDate"></span> | Tanév: 2024/2025</p>
+    </div>
+
+    <table class="print-table">
+      <thead>
+        <tr>
+          <th>Tanuló azonosító / Becenév</th>
+          <th>Összes hiányzás</th>
+          <th>Szülői igazolás (max. 40)</th>
+          <th>Még felhasználható szülői</th>
+          <th>Orvosi igazolás</th>
+          <th>Igazolásra váró</th>
+        </tr>
+      </thead>
+      <tbody id="printTableBody">
+        <!-- Rendered dynamically for printing -->
+      </tbody>
+    </table>
+
+    <div style="margin-top: 30pt; font-size: 9pt; color: #555;">
+      * A dokumentum kizárólag anonimizált tanulói azonosítókat tartalmaz az adatvédelmi előírásoknak megfelelően.
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       JAVASCRIPT LOGIC
+       ========================================================================== -->
+  <script>
+    /* ==========================================================================
+       STATE & CONSTANTS
+       ========================================================================== */
+    const STORAGE_KEY = 'galactic_attendance_data_v1';
+    const DEMO_STORAGE_KEY = 'galactic_attendance_demo_data_v1';
+    const PARENTAL_MAX_HOURS = 40;
+
+    let appState = {
+      isDemoMode: false,
+      students: [], // Array of student objects
+      undoStack: []  // Stack for undo functionality
+    };
+
+    /*
+      Student Object Structure:
+      {
+        id: "std_12345",
+        nickname: "Padawan Géza",
+        seen40Anim: false,
+        absences: [
+          {
+            id: "abs_98765",
+            date: "2024-09-15",
+            hours: 4,
+            category: "parental", // 'pending' | 'parental' | 'medical'
+            historyNote: "Rögzítve: 2024-09-15"
+          }
+        ]
+      }
+    */
+
+    /* ==========================================================================
+       INITIALIZATION & STORAGE
+       ========================================================================== */
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAppState();
+      renderAll();
+      setupDefaultDates();
+    });
+
+    function setupDefaultDates() {
+      const today = new Date().toISOString().split('T')[0];
+      const absenceDateInput = document.getElementById('absenceDateInput');
+      if (absenceDateInput) absenceDateInput.value = today;
+    }
+
+    function saveAppState() {
+      const key = appState.isDemoMode ? DEMO_STORAGE_KEY : STORAGE_KEY;
+      const dataToSave = {
+        students: appState.students
+      };
+      localStorage.setItem(key, JSON.stringify(dataToSave));
+      updateUndoButtonState();
+    }
+
+    function loadAppState() {
+      const key = appState.isDemoMode ? DEMO_STORAGE_KEY : STORAGE_KEY;
+      const saved = localStorage.getItem(key);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          appState.students = parsed.students || [];
+        } catch (e) {
+          console.error('Hiba az adatok betöltésekor:', e);
+          appState.students = [];
+        }
+      } else {
+        appState.students = [];
+      }
+    }
+
+    /* Undo Stack Push */
+    function recordUndoSnapshot() {
+      // Keep up to 20 snapshots
+      if (appState.undoStack.length >= 20) {
+        appState.undoStack.shift();
+      }
+      appState.undoStack.push(JSON.stringify(appState.students));
+      updateUndoButtonState();
+    }
+
+    function updateUndoButtonState() {
+      const undoBtn = document.getElementById('undoBtn');
+      if (undoBtn) {
+        undoBtn.disabled = appState.undoStack.length === 0;
+      }
+    }
+
+    function handleUndo() {
+      if (appState.undoStack.length === 0) return;
+      const lastStateJSON = appState.undoStack.pop();
+      try {
+        appState.students = JSON.parse(lastStateJSON);
+        saveAppState();
+        renderAll();
+      } catch (e) {
+        console.error('Hiba a visszavonás során:', e);
+      }
+    }
+
+    /* ==========================================================================
+       DEMO MODE TOGGLE
+       ========================================================================== */
+    function toggleDemoMode() {
+      appState.isDemoMode = !appState.isDemoMode;
+      const btn = document.getElementById('demoToggleBtn');
+
+      if (appState.isDemoMode) {
+        btn.classList.add('btn-warn');
+        btn.innerHTML = '<span>🧪 Demo Mód (AKTÍV)</span>';
+
+        // Load demo data if empty
+        const savedDemo = localStorage.getItem(DEMO_STORAGE_KEY);
+        if (!savedDemo) {
+          initDemoData();
+        } else {
+          loadAppState();
+        }
+      } else {
+        btn.classList.remove('btn-warn');
+        btn.innerHTML = '<span>🧪 Demo Mód</span>';
+        loadAppState();
+      }
+
+      appState.undoStack = [];
+      renderAll();
+    }
+
+    function initDemoData() {
+      appState.students = [
+        {
+          id: 'demo_1',
+          nickname: 'Padawan Géza',
+          seen40Anim: false,
+          absences: [
+            { id: 'd_a1', date: '2024-09-10', hours: 6, category: 'medical', historyNote: 'Orvosi igazolás' },
+            { id: 'd_a2', date: '2024-09-18', hours: 4, category: 'parental', historyNote: 'Szülői igazolás' },
+            { id: 'd_a3', date: '2024-10-02', hours: 3, category: 'pending', historyNote: 'Igazolásra vár' }
+          ]
+        },
+        {
+          id: 'demo_2',
+          nickname: 'Kadét Ahsoka',
+          seen40Anim: true,
+          absences: [
+            { id: 'd_a4', date: '2024-09-05', hours: 40, category: 'parental', historyNote: 'Éves szülői keret kimerítve' },
+            { id: 'd_a5', date: '2024-10-12', hours: 15, category: 'medical', historyNote: 'Orvosi igazolás' }
+          ]
+        },
+        {
+          id: 'demo_3',
+          nickname: 'Pilóta Ezra',
+          seen40Anim: false,
+          absences: [
+            { id: 'd_a6', date: '2024-09-22', hours: 32, category: 'parental', historyNote: 'Szülői igazolások' },
+            { id: 'd_a7', date: '2024-10-05', hours: 5, category: 'pending', historyNote: 'Igazolásra vár' }
+          ]
+        },
+        {
+          id: 'demo_4',
+          nickname: 'Kutató Sabine',
+          seen40Anim: false,
+          absences: [
+            { id: 'd_a8', date: '2024-10-01', hours: 36, category: 'parental', historyNote: 'Szülői igazolás' }
+          ]
+        },
+        {
+          id: 'demo_5',
+          nickname: 'Technikus Cal',
+          seen40Anim: false,
+          absences: [
+            { id: 'd_a9', date: '2024-09-12', hours: 12, category: 'medical', historyNote: 'Orvosi igazolás' }
+          ]
+        }
+      ];
+      saveAppState();
+    }
+
+    /* ==========================================================================
+       CALCULATIONS & MATH LOGIC
+       ========================================================================== */
+    function getStudentStats(student) {
+      let totalParental = 0;
+      let totalMedical = 0;
+      let totalPending = 0;
+
+      if (student.absences && Array.isArray(student.absences)) {
+        student.absences.forEach(a => {
+          const h = parseInt(a.hours, 10) || 0;
+          if (a.category === 'parental') totalParental += h;
+          else if (a.category === 'medical') totalMedical += h;
+          else if (a.category === 'pending') totalPending += h;
+        });
+      }
+
+      const totalExcused = totalParental + totalMedical;
+      const totalAbsences = totalExcused + totalPending;
+      const parentalRemaining = Math.max(0, PARENTAL_MAX_HOURS - totalParental);
+
+      return {
+        totalParental,
+        totalMedical,
+        totalPending,
+        totalExcused,
+        totalAbsences,
+        parentalRemaining
+      };
+    }
+
+    /* ==========================================================================
+       RENDERING & VIEW MANAGEMENT
+       ========================================================================== */
+    function renderAll() {
+      renderStudents();
+      renderDashboard();
+      updateBadges();
+    }
+
+    function switchTab(tabName) {
+      const tabStudentsBtn = document.getElementById('tabStudentsBtn');
+      const tabStatsBtn = document.getElementById('tabStatsBtn');
+      const studentsView = document.getElementById('studentsView');
+      const dashboardView = document.getElementById('dashboardView');
+
+      if (tabName === 'students') {
+        tabStudentsBtn.classList.add('active');
+        tabStatsBtn.classList.remove('active');
+        studentsView.style.display = 'block';
+        dashboardView.style.display = 'none';
+        renderStudents();
+      } else {
+        tabStatsBtn.classList.add('active');
+        tabStudentsBtn.classList.remove('active');
+        studentsView.style.display = 'none';
+        dashboardView.style.display = 'block';
+        renderDashboard();
+      }
+    }
+
+    function updateBadges() {
+      const badge = document.getElementById('studentCountBadge');
+      if (badge) badge.textContent = appState.students.length;
+    }
+
+    let isAttentionFilterActive = false;
+
+    function toggleAttentionFilter() {
+      isAttentionFilterActive = !isAttentionFilterActive;
+      const btn = document.getElementById('attentionFilterBtn');
+      btn.classList.toggle('active', isAttentionFilterActive);
+
+      const filterStatusInfo = document.getElementById('filterStatusInfo');
+      if (isAttentionFilterActive) {
+        filterStatusInfo.textContent = '⚠️ Szűrő aktív: Igazolásra váró VAGY 30+ szülői órával rendelkező tanulók';
+      } else {
+        filterStatusInfo.textContent = 'Összes tanuló megjelenítve';
+      }
+      renderStudents();
+    }
+
+    function renderStudents() {
+      const grid = document.getElementById('studentsGridContainer');
+      if (!grid) return;
+
+      const searchValue = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+      const sortValue = document.getElementById('sortSelect').value;
+
+      let filtered = appState.students.filter(s => {
+        const matchesSearch = s.nickname.toLowerCase().includes(searchValue);
+        if (!matchesSearch) return false;
+
+        if (isAttentionFilterActive) {
+          const stats = getStudentStats(s);
+          const needsAttention = stats.totalPending > 0 || stats.totalParental >= 30;
+          return needsAttention;
+        }
+        return true;
+      });
+
+      // Sorting
+      filtered.sort((a, b) => {
+        const statsA = getStudentStats(a);
+        const statsB = getStudentStats(b);
+
+        if (sortValue === 'nickname') {
+          return a.nickname.localeCompare(b.nickname, 'hu');
+        } else if (sortValue === 'totalDesc') {
+          return statsB.totalAbsences - statsA.totalAbsences;
+        } else if (sortValue === 'pendingDesc') {
+          return statsB.totalPending - statsA.totalPending;
+        } else if (sortValue === 'parentalDesc') {
+          return statsB.totalParental - statsA.totalParental;
+        } else if (sortValue === 'medicalDesc') {
+          return statsB.totalMedical - statsA.totalMedical;
+        }
+        return 0;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <h3>Nincs megjeleníthető Padawan</h3>
+            <p>Hozz létre új tanulót a fenti gombbal, vagy módosítsd a keresési feltételeket.</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(s => {
+        const stats = getStudentStats(s);
+
+        // Gauge percent & class
+        const percent = Math.min(100, Math.round((stats.totalParental / PARENTAL_MAX_HOURS) * 100));
+        let saberClass = 'saber-bar';
+        let cardBorderClass = '';
+
+        if (stats.totalParental >= 40) {
+          saberClass += ' saber-critical';
+          cardBorderClass = 'card-critical';
+        } else if (stats.totalParental >= 35) {
+          saberClass += ' saber-alert';
+          cardBorderClass = 'card-alert';
+        } else if (stats.totalParental >= 30) {
+          saberClass += ' saber-warn';
+          cardBorderClass = 'card-warn';
+        }
+
+        return `
+          <div class="student-card ${cardBorderClass}">
+            <div>
+              <div class="card-header">
+                <div class="student-nickname">
+                  <span class="student-rank-icon">🛡️</span>
+                  <span>${escapeHtml(s.nickname)}</span>
+                </div>
+                <div class="card-actions-top">
+                  <button class="icon-btn" onclick="openEditStudentModal('${s.id}')" title="Szerkesztés">✏️</button>
+                  <button class="icon-btn delete-btn" onclick="confirmDeleteStudent('${s.id}')" title="Törlés">🗑️</button>
+                </div>
+              </div>
+
+              <div class="metrics-container">
+                <div class="metric-row">
+                  <span class="metric-label">Összes hiányzás:</span>
+                  <span class="metric-value">${stats.totalAbsences} óra</span>
+                </div>
+                <div class="metric-row">
+                  <span class="metric-label">🩺 Orvosi igazolás:</span>
+                  <span class="metric-value" style="color: var(--cyan-holo);">${stats.totalMedical} óra</span>
+                </div>
+              </div>
+
+              <!-- Lightsaber Gauge -->
+              <div class="saber-gauge-wrapper">
+                <div class="saber-gauge-labels">
+                  <span style="color: var(--text-muted);">Szülői igazolás:</span>
+                  <strong style="color: #ffffff;">${stats.totalParental} / ${PARENTAL_MAX_HOURS} óra</strong>
+                </div>
+                <div class="saber-track">
+                  <div class="${saberClass}" style="width: ${percent}%;"></div>
+                </div>
+                <div style="font-size: 0.78rem; margin-top: 4px; display: flex; justify-content: space-between; color: var(--text-muted);">
+                  <span>Még felhasználható:</span>
+                  <strong style="color: ${stats.parentalRemaining === 0 ? 'var(--red-critical)' : 'var(--green-saber)'};">${stats.parentalRemaining} óra</strong>
+                </div>
+              </div>
+
+              <!-- Pending Hours Box -->
+              <div class="pending-box ${stats.totalPending > 0 ? 'has-pending' : ''}">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span>📡 Igazolásra vár:</span>
+                  <strong>${stats.totalPending} óra</strong>
+                </div>
+                ${stats.totalPending > 0 ? `<span style="font-size: 0.75rem; background: rgba(234, 179, 8, 0.2); padding: 2px 6px; border-radius: 4px;">Átminősítendő</span>` : ''}
+              </div>
+            </div>
+
+            <div class="card-footer-btns">
+              <button class="btn btn-sm btn-primary" onclick="openAbsenceModalForStudent('${s.id}')">+ Hiányzás</button>
+              <button class="btn btn-sm btn-warn" onclick="openReclassifyModal('${s.id}')" ${stats.totalPending === 0 ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>Átminősítés</button>
+              <button class="btn btn-sm" onclick="openHistoryModal('${s.id}')">Előzmények</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    /* ==========================================================================
+       DASHBOARD STATS RENDERING
+       ========================================================================== */
+    function renderDashboard() {
+      const periodSelect = document.getElementById('statsPeriodSelect');
+      const period = periodSelect ? periodSelect.value : 'year';
+
+      let totalClassAbsences = 0;
+      let totalClassExcused = 0;
+      let totalClassParental = 0;
+      let totalClassMedical = 0;
+      let totalClassPending = 0;
+
+      let pendingStudentsCount = 0;
+      let parental30Count = 0;
+      let parental35Count = 0;
+      let parental40Count = 0;
+
+      appState.students.forEach(s => {
+        const overallStats = getStudentStats(s);
+
+        // Yearly limit indicators
+        if (overallStats.totalParental >= 30 && overallStats.totalParental < 35) parental30Count++;
+        if (overallStats.totalParental >= 35 && overallStats.totalParental < 40) parental35Count++;
+        if (overallStats.totalParental >= 40) parental40Count++;
+
+        let pParental = 0;
+        let pMedical = 0;
+        let pPending = 0;
+
+        if (s.absences && Array.isArray(s.absences)) {
+          s.absences.forEach(a => {
+            let include = false;
+            if (period === 'year') {
+              include = true;
+            } else if (a.date) {
+              const month = a.date.split('-')[1];
+              if (month === period) include = true;
+            }
+
+            if (include) {
+              const h = parseInt(a.hours, 10) || 0;
+              if (a.category === 'parental') pParental += h;
+              else if (a.category === 'medical') pMedical += h;
+              else if (a.category === 'pending') pPending += h;
+            }
+          });
+        }
+
+        if (pPending > 0) pendingStudentsCount++;
+
+        totalClassParental += pParental;
+        totalClassMedical += pMedical;
+        totalClassPending += pPending;
+      });
+
+      totalClassExcused = totalClassParental + totalClassMedical;
+      totalClassAbsences = totalClassExcused + totalClassPending;
+
+      // Update Card UI
+      document.getElementById('statTotalAbsences').textContent = `${totalClassAbsences} óra`;
+      document.getElementById('statTotalExcused').textContent = `${totalClassExcused} óra`;
+      document.getElementById('statTotalPending').textContent = `${totalClassPending} óra`;
+      document.getElementById('statPendingStudentsCount').textContent = `${pendingStudentsCount} tanulónál`;
+      document.getElementById('statParental30Count').textContent = `${parental30Count + parental35Count + parental40Count} fő`;
+
+      const periodLabels = {
+        'year': 'Teljes tanév',
+        '09': 'Szeptember', '10': 'Október', '11': 'November', '12': 'December',
+        '01': 'Január', '02': 'Február', '03': 'Március', '04': 'Április', '05': 'Május', '06': 'Június'
+      };
+      document.getElementById('statPeriodLabel').textContent = periodLabels[period] || period;
+
+      // Tree Breakdown
+      const treeList = document.getElementById('statTreeList');
+      if (treeList) {
+        treeList.innerHTML = `
+          <li><strong>${(periodLabels[period] || period).toUpperCase()}I ÖSSZESÍTÉS</strong></li>
+          <li>Összes hiányzás: ${totalClassAbsences} óra</li>
+          <li>Összes igazolt: ${totalClassExcused} óra</li>
+          <li>├─ Szülői igazolás: ${totalClassParental} óra</li>
+          <li>└─ Orvosi igazolás: ${totalClassMedical} óra</li>
+          <li>Igazolásra vár: ${totalClassPending} óra</li>
+          <li style="margin-top: 10px; color: var(--cyan-holo);"><strong>ÉVES SZÜLŐI KERET STÁTUSZ (OSZTÁLY):</strong></li>
+          <li>• 30–34 óra közötti szülői hiányzás: ${parental30Count} tanuló</li>
+          <li>• 35–39 óra közötti szülői hiányzás: ${parental35Count} tanuló</li>
+          <li>• 40/40 órás keretet elért tanulók: ${parental40Count} tanuló</li>
+        `;
+      }
+    }
+
+    /* ==========================================================================
+       STUDENT CRUD ACTIONS
+       ========================================================================== */
+    function openAddStudentModal() {
+      document.getElementById('studentModalTitle').textContent = '👨‍🎓 Új Padawan Felvétele';
+      document.getElementById('studentFormId').value = '';
+      document.getElementById('studentFormNickname').value = '';
+      openModal('studentModal');
+    }
+
+    function openEditStudentModal(studentId) {
+      const student = appState.students.find(s => s.id === studentId);
+      if (!student) return;
+
+      document.getElementById('studentModalTitle').textContent = '✏️ Padawan Szerkesztése';
+      document.getElementById('studentFormId').value = student.id;
+      document.getElementById('studentFormNickname').value = student.nickname;
+      openModal('studentModal');
+    }
+
+    function handleStudentFormSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('studentFormId').value;
+      const nickname = document.getElementById('studentFormNickname').value.trim();
+
+      if (!nickname) return;
+
+      recordUndoSnapshot();
+
+      if (id) {
+        // Edit existing
+        const student = appState.students.find(s => s.id === id);
+        if (student) student.nickname = nickname;
+      } else {
+        // Create new
+        const newStudent = {
+          id: 'std_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+          nickname: nickname,
+          seen40Anim: false,
+          absences: []
+        };
+        appState.students.push(newStudent);
+      }
+
+      saveAppState();
+      renderAll();
+      closeModal('studentModal');
+    }
+
+    function confirmDeleteStudent(studentId) {
+      const student = appState.students.find(s => s.id === studentId);
+      if (!student) return;
+
+      if (confirm(`Biztosan törölni szeretné "${student.nickname}" tanulót és minden hiányzási előzményét?`)) {
+        recordUndoSnapshot();
+        appState.students = appState.students.filter(s => s.id !== studentId);
+        saveAppState();
+        renderAll();
+      }
+    }
+
+    /* ==========================================================================
+       ABSENCE RECORDING & PARENTAL LIMIT CHECK
+       ========================================================================== */
+    function openDirectAbsenceModal() {
+      if (appState.students.length === 0) {
+        alert('Kérjük, először vegyen fel legalább egy tanulót!');
+        return;
+      }
+      populateStudentSelect('absenceStudentSelect');
+      setupDefaultDates();
+      document.getElementById('absenceHoursInput').value = '1';
+      openModal('absenceModal');
+    }
+
+    function openAbsenceModalForStudent(studentId) {
+      populateStudentSelect('absenceStudentSelect', studentId);
+      setupDefaultDates();
+      document.getElementById('absenceHoursInput').value = '1';
+      openModal('absenceModal');
+    }
+
+    function populateStudentSelect(elementId, selectedId = null) {
+      const select = document.getElementById(elementId);
+      if (!select) return;
+
+      select.innerHTML = appState.students.map(s => {
+        return `<option value="${s.id}" ${s.id === selectedId ? 'selected' : ''}>${escapeHtml(s.nickname)}</option>`;
+      }).join('');
+    }
+
+    function setQuickHours(hours) {
+      document.getElementById('absenceHoursInput').value = hours;
+    }
+
+    function handleAbsenceFormSubmit(e) {
+      e.preventDefault();
+      const studentId = document.getElementById('absenceStudentSelect').value;
+      const category = document.getElementById('absenceCategorySelect').value;
+      const date = document.getElementById('absenceDateInput').value;
+      const hours = parseInt(document.getElementById('absenceHoursInput').value, 10);
+
+      if (!studentId || !date || isNaN(hours) || hours <= 0) return;
+
+      const student = appState.students.find(s => s.id === studentId);
+      if (!student) return;
+
+      const currentStats = getStudentStats(student);
+
+      // STRICT PARENTAL CHECK
+      if (category === 'parental') {
+        const potentialParental = currentStats.totalParental + hours;
+        if (potentialParental > PARENTAL_MAX_HOURS) {
+          alert(`⚠️ Szigorú korlát figyelmeztetés:\nA művelet nem hajtható végre!\nA tanuló szülői kerete túllépné a megengedett 40 órát (${currentStats.totalParental} + ${hours} = ${potentialParental} óra).\n\nKérjük, rögzítse orvosi igazolásként vagy igazolásra váróként!`);
+          return; // Cancel operation
+        }
+      }
+
+      recordUndoSnapshot();
+
+      const newAbsence = {
+        id: 'abs_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+        date: date,
+        hours: hours,
+        category: category,
+        historyNote: `Rögzítve: ${date}`
+      };
+
+      if (!student.absences) student.absences = [];
+      student.absences.push(newAbsence);
+
+      const updatedStats = getStudentStats(student);
+
+      // CHECK FOR FIRST TIME 40/40 REACHED ANIMATION
+      let triggerAnim = false;
+      if (updatedStats.totalParental >= PARENTAL_MAX_HOURS && !student.seen40Anim) {
+        student.seen40Anim = true; // Mark as seen
+        triggerAnim = true;
+      }
+
+      saveAppState();
+      renderAll();
+      closeModal('absenceModal');
+
+      if (triggerAnim) {
+        document.getElementById('holoAnimStudentName').textContent = student.nickname.toUpperCase();
+        openModal('holoAnimModal');
+      }
+    }
+
+    /* ==========================================================================
+       RECLASSIFY PENDING HOURS LOGIC
+       ========================================================================== */
+    function openReclassifyModal(studentId) {
+      const student = appState.students.find(s => s.id === studentId);
+      if (!student) return;
+
+      const stats = getStudentStats(student);
+      if (stats.totalPending <= 0) {
+        alert('Ennek a tanulónak nincs igazolásra váró órája!');
+        return;
+      }
+
+      document.getElementById('reclassifyStudentId').value = student.id;
+      document.getElementById('reclassifyStudentName').textContent = student.nickname;
+      document.getElementById('reclassifyPendingAvailable').textContent = stats.totalPending;
+      document.getElementById('reclassifyHoursInput').value = stats.totalPending;
+      document.getElementById('reclassifyHoursInput').max = stats.totalPending;
+
+      openModal('reclassifyModal');
+    }
+
+    function handleReclassifyFormSubmit(e) {
+      e.preventDefault();
+      const studentId = document.getElementById('reclassifyStudentId').value;
+      const reclassifyHours = parseInt(document.getElementById('reclassifyHoursInput').value, 10);
+      const targetCategory = document.getElementById('reclassifyTargetSelect').value;
+
+      const student = appState.students.find(s => s.id === studentId);
+      if (!student || isNaN(reclassifyHours) || reclassifyHours <= 0) return;
+
+      const currentStats = getStudentStats(student);
+
+      if (reclassifyHours > currentStats.totalPending) {
+        alert('Nem átminősíthető több óra, mint amennyi igazolásra vár!');
+        return;
+      }
+
+      // Check parental limit if target is parental
+      if (targetCategory === 'parental') {
+        if (currentStats.totalParental + reclassifyHours > PARENTAL_MAX_HOURS) {
+          alert(`⚠️ Szigorú korlát figyelmeztetés:\nNem minősíthető át ${reclassifyHours} óra szülőivé, mert a tanuló szülői kerete túllépné a 40 órát (${currentStats.totalParental} + ${reclassifyHours} = ${currentStats.totalParental + reclassifyHours} óra).`);
+          return;
+        }
+      }
+
+      recordUndoSnapshot();
+
+      // Deduct from pending entries chronologically and move to targetCategory
+      let remainingToReclassify = reclassifyHours;
+
+      // Filter pending absences
+      const pendingEntries = student.absences.filter(a => a.category === 'pending');
+
+      for (let entry of pendingEntries) {
+        if (remainingToReclassify <= 0) break;
+
+        const entryHours = entry.hours;
+        if (entryHours <= remainingToReclassify) {
+          // Entire entry changes category
+          entry.category = targetCategory;
+          entry.historyNote = (entry.historyNote || '') + ` | Átminősítve (${targetCategory}): ${new Date().toLocaleDateString('hu-HU')}`;
+          remainingToReclassify -= entryHours;
+        } else {
+          // Entry split into converted part and remaining pending part
+          const convertedHours = remainingToReclassify;
+          const leftPendingHours = entryHours - convertedHours;
+
+          entry.hours = leftPendingHours; // Keep remainder in pending
+
+          // Add new entry for converted part
+          student.absences.push({
+            id: 'abs_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+            date: entry.date,
+            hours: convertedHours,
+            category: targetCategory,
+            historyNote: `Átminősítve ${convertedHours} óra igazolásra váróból (${targetCategory}): ${new Date().toLocaleDateString('hu-HU')}`
+          });
+
+          remainingToReclassify = 0;
+        }
+      }
+
+      const updatedStats = getStudentStats(student);
+
+      let triggerAnim = false;
+      if (updatedStats.totalParental >= PARENTAL_MAX_HOURS && !student.seen40Anim) {
+        student.seen40Anim = true;
+        triggerAnim = true;
+      }
+
+      saveAppState();
+      renderAll();
+      closeModal('reclassifyModal');
+
+      if (triggerAnim) {
+        document.getElementById('holoAnimStudentName').textContent = student.nickname.toUpperCase();
+        openModal('holoAnimModal');
+      }
+    }
+
+    /* ==========================================================================
+       HISTORY & ENTRY EDITING/DELETION
+       ========================================================================== */
+    function openHistoryModal(studentId) {
+      const student = appState.students.find(s => s.id === studentId);
+      if (!student) return;
+
+      document.getElementById('historyStudentTitle').textContent = student.nickname;
+      const tableBody = document.getElementById('historyTableBody');
+
+      if (!student.absences || student.absences.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 20px;">
+              Nincsenek rögzített hiányzások.
+            </td>
+          </tr>
+        `;
+      } else {
+        const catLabels = {
+          'pending': '🟡 Igazolásra vár',
+          'parental': '🟢 Szülői igazolás',
+          'medical': '🔵 Orvosi igazolás'
+        };
+
+        tableBody.innerHTML = student.absences.map((entry, idx) => {
+          return `
+            <tr>
+              <td>${escapeHtml(entry.date)}</td>
+              <td><strong>${entry.hours} óra</strong></td>
+              <td>${catLabels[entry.category] || entry.category}</td>
+              <td style="font-size: 0.78rem; color: var(--text-muted);">${escapeHtml(entry.historyNote || '-')}</td>
+              <td>
+                <button class="icon-btn" onclick="openEditEntryModal('${student.id}', ${idx})" title="Szerkesztés">✏️</button>
+                <button class="icon-btn delete-btn" onclick="deleteEntry('${student.id}', ${idx})" title="Törlés">🗑️</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      openModal('historyModal');
+    }
+
+    function openEditEntryModal(studentId, index) {
+      const student = appState.students.find(s => s.id === studentId);
+      if (!student || !student.absences[index]) return;
+
+      const entry = student.absences[index];
+      document.getElementById('editEntryStudentId').value = studentId;
+      document.getElementById('editEntryIndex').value = index;
+      document.getElementById('editEntryDate').value = entry.date;
+      document.getElementById('editEntryHours').value = entry.hours;
+      document.getElementById('editEntryCategory').value = entry.category;
+
+      openModal('editEntryModal');
+    }
+
+    function handleEditEntryFormSubmit(e) {
+      e.preventDefault();
+      const studentId = document.getElementById('editEntryStudentId').value;
+      const index = parseInt(document.getElementById('editEntryIndex').value, 10);
+      const date = document.getElementById('editEntryDate').value;
+      const hours = parseInt(document.getElementById('editEntryHours').value, 10);
+      const category = document.getElementById('editEntryCategory').value;
+
+      const student = appState.students.find(s => s.id === studentId);
+      if (!student || !student.absences[index] || isNaN(hours) || hours <= 0) return;
+
+      // Check parental limit
+      if (category === 'parental') {
+        const currentStats = getStudentStats(student);
+        const oldEntry = student.absences[index];
+        const oldParentalContribution = oldEntry.category === 'parental' ? oldEntry.hours : 0;
+        const netChange = hours - oldParentalContribution;
+
+        if (currentStats.totalParental + netChange > PARENTAL_MAX_HOURS) {
+          alert(`⚠️ Módosítás elutasítva: A szülői keret túlcsordulna (X > 40 óra)!`);
+          return;
+        }
+      }
+
+      recordUndoSnapshot();
+
+      student.absences[index].date = date;
+      student.absences[index].hours = hours;
+      student.absences[index].category = category;
+      student.absences[index].historyNote = `Módosítva: ${new Date().toLocaleDateString('hu-HU')}`;
+
+      saveAppState();
+      renderAll();
+      closeModal('editEntryModal');
+      openHistoryModal(studentId); // Refresh history view
+    }
+
+    function deleteEntry(studentId, index) {
+      const student = appState.students.find(s => s.id === studentId);
+      if (!student || !student.absences[index]) return;
+
+      if (confirm('Biztosan törölni szeretné ezt a hiányzásbejegyzést?')) {
+        recordUndoSnapshot();
+        student.absences.splice(index, 1);
+        saveAppState();
+        renderAll();
+        openHistoryModal(studentId); // Refresh history view
+      }
+    }
+
+    /* ==========================================================================
+       BACKUP, JSON EXPORT/IMPORT, NEW SCHOOL YEAR
+       ========================================================================== */
+    function openBackupModal() {
+      openModal('backupModal');
+    }
+
+    function exportDataJSON() {
+      const exportObject = {
+        app: 'GalacticAttendanceTracker',
+        version: '1.0',
+        exportDate: new Date().toISOString(),
+        students: appState.students
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObject, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `galaktikus_hianyzásmentes_${new Date().toISOString().split('T')[0]}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importDataJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          // Schema Validation
+          if (parsed && Array.isArray(parsed.students)) {
+            if (confirm(`A fájl sikeresen beolvasva (${parsed.students.length} tanuló található benne).\nSzeretné felülírni a jelenlegi adatokat?`)) {
+              recordUndoSnapshot();
+              appState.students = parsed.students;
+              saveAppState();
+              renderAll();
+              closeModal('backupModal');
+              alert('Adatok sikeresen importálva!');
+            }
+          } else {
+            alert('⚠️ Érvénytelen fájlformátum vagy hibás séma! A JSON fájl nem tartalmaz megfelelő tanulói tömböt.');
+          }
+        } catch (err) {
+          alert('⚠️ Hiba a JSON fájl feldolgozása során: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+      // Reset input
+      event.target.value = '';
+    }
+
+    function startNewSchoolYear() {
+      if (confirm('⚠️ BIZTONSÁGI FIGYELMEZTETÉS:\nÚj tanév kezdésekor minden hiányzási előzmény törlődik a rendszerből.\n\nSzeretne előbb biztonsági mentést (JSON export) készíteni?')) {
+        exportDataJSON();
+      }
+
+      setTimeout(() => {
+        if (confirm('Biztosan végrehajtja az adatnullázást és elindítja az új tanévet?')) {
+          recordUndoSnapshot();
+          appState.students.forEach(s => {
+            s.absences = [];
+            s.seen40Anim = false;
+          });
+          saveAppState();
+          renderAll();
+          closeModal('backupModal');
+          alert('Az új tanév elindult, a hiányzások nullázva lettek.');
+        }
+      }, 500);
+    }
+
+    /* ==========================================================================
+       PRINT SUMMARY VIEW
+       ========================================================================== */
+    function triggerPrintView() {
+      const printDate = document.getElementById('printDate');
+      if (printDate) printDate.textContent = new Date().toLocaleDateString('hu-HU');
+
+      const printTableBody = document.getElementById('printTableBody');
+      if (printTableBody) {
+        printTableBody.innerHTML = appState.students.map(s => {
+          const stats = getStudentStats(s);
+          return `
+            <tr>
+              <td><strong>${escapeHtml(s.nickname)}</strong></td>
+              <td>${stats.totalAbsences} óra</td>
+              <td>${stats.totalParental} / ${PARENTAL_MAX_HOURS} óra</td>
+              <td>${stats.parentalRemaining} óra</td>
+              <td>${stats.totalMedical} óra</td>
+              <td>${stats.totalPending} óra</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      window.print();
+    }
+
+    /* ==========================================================================
+       UTILITY HELPERS & MODAL CONTROLS
+       ========================================================================== */
+    function openModal(modalId) {
+      const el = document.getElementById(modalId);
+      if (el) el.classList.add('active');
+    }
+
+    function closeModal(modalId) {
+      const el = document.getElementById(modalId);
+      if (el) el.classList.remove('active');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>
